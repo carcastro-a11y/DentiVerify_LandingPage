@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DentiVerify | AI Dental Insurance Verification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            blue: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            },
+            navy: '#0f1e3d',
+            warmwhite: '#fdfcfb',
+            warmgray: '#f5f4f2',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: #fdfcfb; font-family: 'Inter', sans-serif; color: #0f1e3d; }
+
+    .fade-in { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    .fade-in-delay-1 { transition-delay: 0.1s; }
+    .fade-in-delay-2 { transition-delay: 0.2s; }
+    .fade-in-delay-3 { transition-delay: 0.3s; }
+
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+    @keyframes flow-line { 0%{stroke-dashoffset:200} 100%{stroke-dashoffset:0} }
+    @keyframes slide-up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes data-pop { 0%{opacity:0;transform:scale(.92)} 100%{opacity:1;transform:scale(1)} }
+    @keyframes call-ring { 0%,100%{transform:rotate(0deg)} 10%{transform:rotate(-8deg)} 20%{transform:rotate(8deg)} 30%{transform:rotate(-6deg)} 40%{transform:rotate(0deg)} }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+    @keyframes waveform {
+      0%,100% { transform: scaleY(0.3); }
+      50% { transform: scaleY(1); }
+    }
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .logo-text { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; }
+    .logo-check { color: #2563eb; }
+    
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 4px 16px rgba(37,99,235,0.35); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: transparent;
+      color: #0f1e3d;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1.5px solid #d4d2ce;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-secondary:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+    nav.scrolled { background: rgba(253,252,251,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 12px rgba(0,0,0,0.04); }
+
+    .hero-mockup { animation: float 5s ease-in-out infinite; }
+
+    .step-number {
+      width: 40px; height: 40px;
+      background: #2563eb;
+      color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .step-connector { width: 2px; height: 48px; background: linear-gradient(to bottom, #2563eb, #bfdbfe); margin: 4px 0 4px 19px; }
+
+    .feature-card {
+      background: white;
+      border: 1px solid #ece9e4;
+      border-radius: 16px;
+      padding: 32px;
+      transition: box-shadow 0.25s, transform 0.25s;
+    }
+    .feature-card:hover { box-shadow: 0 12px 40px rgba(15,30,61,0.10); transform: translateY(-3px); }
+
+    .testimonial-card {
+      background: white;
+      border: 1px solid #ece9e4;
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .form-input {
+      width: 100%;
+      border: 1.5px solid #ddd9d3;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: #0f1e3d;
+      background: white;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+
+    .pain-bar { background: #f0f4fe; border: 1px solid #dbeafe; border-radius: 16px; }
+
+    .waveform-bar {
+      width: 3px;
+      border-radius: 2px;
+      background: #2563eb;
+      animation: waveform 0.8s ease-in-out infinite;
+    }
+
+    .ticker-wrap { overflow: hidden; }
+    .ticker-track { display: flex; width: max-content; animation: ticker 22s linear infinite; }
+    .ticker-track:hover { animation-play-state: paused; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "heroHeadline": "Stop Making Insurance Calls. We Do It For You.",
+      "accentColor": "#2563eb",
+      "showSocialProof": true,
+      "heroLayout": "split",
+      "ctaPrimary": "Request a Demo",
+      "ctaSecondary": "See How It Works"
+    }/*EDITMODE-END*/;
+
+    // ── Intersection Observer hook ──
+    function useFadeIn() {
+      const ref = useRef(null);
+      useEffect(() => {
+        const el = ref.current; if (!el) return;
+        const obs = new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) { el.classList.add('visible'); obs.disconnect(); }
+        }, { threshold: 0.12 });
+        obs.observe(el);
+        return () => obs.disconnect();
+      }, []);
+      return ref;
+    }
+
+    function FadeIn({ children, delay = 0, className = '' }) {
+      const ref = useRef(null);
+      useEffect(() => {
+        const el = ref.current; if (!el) return;
+        const obs = new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) { el.classList.add('visible'); obs.disconnect(); }
+        }, { threshold: 0.1 });
+        obs.observe(el);
+        return () => obs.disconnect();
+      }, []);
+      return (
+        <div ref={ref} className={`fade-in ${className}`} style={{ transitionDelay: `${delay}ms` }}>
+          {children}
+        </div>
+      );
+    }
+
+    // ── Logo ──
+    function Logo({ color = '#2563eb' }) {
+      return (
+        <span className="logo-text text-xl tracking-tight" style={{ color: '#0f1e3d' }}>
+          Denti<span style={{ color }}>Verify</span>
+          <svg style={{ display: 'inline', marginLeft: 3, verticalAlign: 'middle' }} width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="8.5" fill={color} fillOpacity="0.12" stroke={color} strokeWidth="1.2" />
+            <path d="M5.5 9.2L7.8 11.5L12.5 6.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      );
+    }
+
+    // ── Nav ──
+    function Nav({ accentColor, ctaPrimary }) {
+      const [scrolled, setScrolled] = useState(false);
+      const [menuOpen, setMenuOpen] = useState(false);
+      useEffect(() => {
+        const h = () => setScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', h);
+        return () => window.removeEventListener('scroll', h);
+      }, []);
+      return (
+        <nav className={scrolled ? 'scrolled' : ''}>
+          <div style={{ maxWidth: 1120, margin: '0 auto', padding: '0 24px', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Logo color={accentColor} />
+            <div style={{ display: 'flex', gap: 32, alignItems: 'center' }} className="hidden md:flex">
+              {['How It Works', 'Features', 'Demo'].map(link => (
+                <a key={link} href={`#${link.toLowerCase().replace(/\s+/g,'-')}`}
+                  style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 500, fontSize: 15, color: '#3d3d3d', textDecoration: 'none', transition: 'color 0.15s' }}
+                  onMouseEnter={e => e.target.style.color = accentColor}
+                  onMouseLeave={e => e.target.style.color = '#3d3d3d'}
+                >{link}</a>
+              ))}
+              <a href="Login.html" style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 500, fontSize: 15, color: '#3d3d3d', textDecoration: 'none', transition: 'color 0.15s', padding: '10px 4px' }}
+                onMouseEnter={e => e.target.style.color = accentColor}
+                onMouseLeave={e => e.target.style.color = '#3d3d3d'}>Login</a>
+              <button className="btn-primary" style={{ padding: '10px 20px', fontSize: 14 }}
+                onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+                {ctaPrimary}
+              </button>
+            </div>
+            <button style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 5, padding: 8 }}
+              className="md:hidden" onClick={() => setMenuOpen(o => !o)}>
+              {[0,1,2].map(i => <span key={i} style={{ width: 22, height: 2, background: '#0f1e3d', borderRadius: 2, display: 'block' }}></span>)}
+            </button>
+          </div>
+          {menuOpen && (
+            <div style={{ background: 'white', borderTop: '1px solid #ece9e4', padding: '16px 24px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {['How It Works', 'Features', 'Demo'].map(link => (
+                <a key={link} href={`#${link.toLowerCase().replace(/\s+/g,'-')}`}
+                  style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 500, fontSize: 15, color: '#3d3d3d', textDecoration: 'none' }}
+                  onClick={() => setMenuOpen(false)}>{link}</a>
+              ))}
+              <button className="btn-primary" style={{ padding: '12px 20px', fontSize: 15, justifyContent: 'center' }}
+                onClick={() => { setMenuOpen(false); document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                {ctaPrimary}
+              </button>
+            </div>
+          )}
+        </nav>
+      );
+    }
+
+    // ── Hero Mockup ──
+    function HeroMockup({ accentColor }) {
+      const [step, setStep] = useState(0);
+      useEffect(() => {
+        const steps = [0, 1, 2, 3];
+        let i = 0;
+        const timer = setInterval(() => {
+          i = (i + 1) % steps.length;
+          setStep(i);
+        }, 2200);
+        return () => clearInterval(timer);
+      }, []);
+
+      const coverageItems = [
+        { label: 'Annual Maximum', value: '$2,000', color: '#16a34a' },
+        { label: 'Deductible Remaining', value: '$150', color: '#2563eb' },
+        { label: 'Preventive Coverage', value: '100%', color: '#16a34a' },
+        { label: 'Basic Restorative', value: '80%', color: '#2563eb' },
+        { label: 'Major Services', value: '50%', color: '#ca8a04' },
+        { label: 'Orthodontia Lifetime', value: '$1,500', color: '#7c3aed' },
+      ];
+
+      return (
+        <div className="hero-mockup" style={{ width: '100%', maxWidth: 480, position: 'relative' }}>
+          {/* Main card */}
+          <div style={{ background: 'white', borderRadius: 20, boxShadow: '0 24px 80px rgba(15,30,61,0.14)', border: '1px solid #ece9e4', overflow: 'hidden' }}>
+            {/* Header bar */}
+            <div style={{ background: accentColor, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', gap: 5 }}>
+                {['#ff6b6b','#ffd93d','#6bcb77'].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c }}></div>)}
+              </div>
+              <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: 'white', flex: 1, textAlign: 'center' }}>DentiVerify · Live Verification</span>
+            </div>
+
+            <div style={{ padding: '20px 24px 24px' }}>
+              {/* Patient card */}
+              <div style={{ background: '#f5f4f2', borderRadius: 10, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: accentColor + '22', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <circle cx="9" cy="7" r="3.5" stroke={accentColor} strokeWidth="1.5"/>
+                    <path d="M2.5 16c0-3.314 2.91-6 6.5-6s6.5 2.686 6.5 6" stroke={accentColor} strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 14, color: '#0f1e3d' }}>Sarah Mitchell</div>
+                  <div style={{ fontSize: 12, color: '#6b7280', fontFamily: 'Inter' }}>DOB 03/14/1985 · Delta Dental PPO</div>
+                </div>
+                <div style={{ marginLeft: 'auto' }}>
+                  <span style={{ background: step >= 3 ? '#dcfce7' : step >= 1 ? '#fef3c7' : '#f3f4f6', color: step >= 3 ? '#16a34a' : step >= 1 ? '#92400e' : '#6b7280', fontSize: 11, fontWeight: 600, fontFamily: 'Plus Jakarta Sans', borderRadius: 20, padding: '3px 10px' }}>
+                    {step >= 3 ? '✓ Verified' : step >= 1 ? 'In Progress' : 'Pending'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Status steps */}
+              <div style={{ marginBottom: 16 }}>
+                {[
+                  { label: 'Connecting to Delta Dental', icon: '📡' },
+                  { label: 'Navigating phone system', icon: '🎛️' },
+                  { label: 'Retrieving eligibility data', icon: '📋' },
+                ].map((s, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', opacity: step > i ? 1 : step === i ? 1 : 0.35, transition: 'opacity 0.4s' }}>
+                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: step > i ? '#dcfce7' : step === i ? accentColor + '18' : '#f3f4f6', border: step > i ? 'none' : `1.5px solid ${step === i ? accentColor : '#d1d5db'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.4s' }}>
+                      {step > i
+                        ? <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.5 9L10 3.5" stroke="#16a34a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        : step === i
+                          ? <div style={{ width: 8, height: 8, borderRadius: '50%', background: accentColor, animation: 'pulse-dot 1.2s ease-in-out infinite' }}></div>
+                          : <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#d1d5db' }}></div>
+                      }
+                    </div>
+                    <span style={{ fontFamily: 'Inter', fontSize: 13, color: step > i ? '#16a34a' : step === i ? '#0f1e3d' : '#9ca3af', fontWeight: step === i ? 500 : 400 }}>{s.label}</span>
+                    {step === i && (
+                      <div style={{ display: 'flex', gap: 3, marginLeft: 'auto', alignItems: 'center', height: 16 }}>
+                        {[0,1,2,3,4].map(j => (
+                          <div key={j} className="waveform-bar" style={{ height: 16, animationDelay: `${j * 0.12}s` }}></div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Results */}
+              <div style={{ transition: 'all 0.5s', opacity: step >= 3 ? 1 : 0, transform: step >= 3 ? 'translateY(0)' : 'translateY(10px)' }}>
+                <div style={{ borderTop: '1px solid #ece9e4', paddingTop: 14, marginTop: 4 }}>
+                  <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 13, color: '#0f1e3d', marginBottom: 10 }}>Coverage Results</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    {coverageItems.map((item, i) => (
+                      <div key={i} style={{ background: '#f9f8f7', borderRadius: 8, padding: '8px 12px', animation: step >= 3 ? `data-pop 0.4s ease both` : 'none', animationDelay: `${i * 0.08}s` }}>
+                        <div style={{ fontSize: 10, color: '#6b7280', fontFamily: 'Inter', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{item.label}</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, fontFamily: 'Plus Jakarta Sans', color: item.color }}>{item.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: 12, background: '#dcfce7', borderRadius: 8, padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" fill="#16a34a"/><path d="M4 7.5L6 9.5L10 5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 12, color: '#15803d' }}>Synced to patient record · 2 min 14 sec</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Floating badge */}
+          <div style={{ position: 'absolute', top: -16, right: -12, background: 'white', border: '1px solid #ece9e4', borderRadius: 12, padding: '8px 14px', boxShadow: '0 8px 24px rgba(15,30,61,0.12)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7.5L5.5 10L11 4" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            <div>
+              <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 12, color: '#0f1e3d' }}>Verified in 2m 14s</div>
+              <div style={{ fontSize: 10, color: '#6b7280', fontFamily: 'Inter' }}>vs. 20+ min manually</div>
+            </div>
+          </div>
+
+          {/* Floating phone badge */}
+          <div style={{ position: 'absolute', bottom: -14, left: -12, background: accentColor, borderRadius: 12, padding: '8px 14px', boxShadow: '0 8px 24px rgba(37,99,235,0.35)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ animation: 'call-ring 2.5s ease-in-out infinite' }}>
+              <path d="M9.5 9c-3.5-3.5-3.5-6.5-3.5-6.5L7.5 1H5.5C3 1 1 3 1 5.5c0 4.143 3.357 7.5 7.5 7.5C11 13 13 11 13 8.5V6.5L11.5 8c0 0-2.5 0-2-1z" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 12, color: 'white' }}>AI call in progress…</span>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Hero ──
+    function Hero({ tweaks, accentColor }) {
+      return (
+        <section style={{ paddingTop: 120, paddingBottom: 96, background: 'linear-gradient(160deg, #fdfcfb 60%, #eff6ff 100%)' }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto', padding: '0 24px', display: 'flex', gap: 64, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 460px', minWidth: 300 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 20, padding: '6px 14px', marginBottom: 24 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#2563eb', animation: 'pulse-dot 1.5s ease-in-out infinite' }}></div>
+                <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#2563eb' }}>AI-Powered Eligibility Verification</span>
+              </div>
+              <h1 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(36px,5vw,58px)', lineHeight: 1.1, color: '#0f1e3d', margin: '0 0 20px', letterSpacing: '-0.02em' }}>
+                {tweaks.heroHeadline}
+              </h1>
+              <p style={{ fontFamily: 'Inter', fontSize: 18, lineHeight: 1.65, color: '#4b5563', margin: '0 0 36px', maxWidth: 480 }}>
+                DentiVerify's AI calls insurance companies on your behalf. It navigates hold times, phone trees, and reps, then delivers clean coverage data directly into your workflow. No portals, no hold music, no manual entry.
+              </p>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <button className="btn-primary" style={{ padding: '14px 28px', fontSize: 16 }}
+                  onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}>
+                  {tweaks.ctaPrimary}
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+                <button className="btn-secondary" style={{ padding: '14px 28px', fontSize: 16 }}
+                  onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>
+                  {tweaks.ctaSecondary}
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M12 9l-4 4-4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+              </div>
+              <div style={{ display: 'flex', gap: 24, marginTop: 40, flexWrap: 'wrap' }}>
+                {[['500+','Dental Offices'],['98%','Accuracy Rate'],['2 min','Avg Verification']].map(([n,l]) => (
+                  <div key={l}>
+                    <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 26, color: '#0f1e3d' }}>{n}</div>
+                    <div style={{ fontFamily: 'Inter', fontSize: 13, color: '#6b7280' }}>{l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ flex: '1 1 400px', display: 'flex', justifyContent: 'center', paddingTop: 20 }}>
+              <HeroMockup accentColor={accentColor} />
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ── Pain Points ──
+    function PainPoints() {
+      const pains = [
+        { icon: '⏱️', label: '20+ min per patient on hold', sub: 'Staff time wasted every single day' },
+        { icon: '🔀', label: 'Juggling multiple insurance portals', sub: 'Each insurer has a different login' },
+        { icon: '⚠️', label: 'Manual data entry errors', sub: 'Costly mistakes that hurt revenue' },
+      ];
+      return (
+        <section style={{ background: '#0f1e3d', padding: '48px 24px' }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+            <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#93c5fd', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 32 }}>The Old Way Is Broken</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 1, background: '#1e3a5f20' }}>
+              {pains.map((p, i) => (
+                <FadeIn key={i} delay={i * 100}>
+                  <div style={{ padding: '28px 32px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 32, marginBottom: 12 }}>{p.icon}</div>
+                    <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 17, color: 'white', marginBottom: 6 }}>{p.label}</div>
+                    <div style={{ fontFamily: 'Inter', fontSize: 14, color: '#93c5fd' }}>{p.sub}</div>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ── How It Works ──
+    function HowItWorks({ accentColor }) {
+      const steps = [
+        { title: 'Submit Patient Info', desc: 'Staff enters patient details into DentiVerify, or it pulls them automatically from your existing practice management system.' },
+        { title: 'AI Makes the Call', desc: 'DentiVerify calls the insurance company, navigates the phone system, and retrieves all eligibility details automatically. Your team never touches the phone.' },
+        { title: 'Get Structured Results', desc: 'Clean coverage data including benefits, deductibles, frequencies, and eligibility status is returned and synced directly into your workflow.' },
+      ];
+      return (
+        <section id="how-it-works" style={{ padding: '96px 24px', background: '#fdfcfb' }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+            <FadeIn>
+              <div style={{ textAlign: 'center', marginBottom: 64 }}>
+                <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: accentColor, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>How It Works</p>
+                <h2 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(28px,4vw,44px)', color: '#0f1e3d', margin: 0, letterSpacing: '-0.02em' }}>From patient name to full coverage in minutes</h2>
+              </div>
+            </FadeIn>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 32 }}>
+              {steps.map((s, i) => (
+                <FadeIn key={i} delay={i * 120}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                      <div>
+                        <div className="step-number" style={{ background: accentColor }}>{i + 1}</div>
+                        {i < steps.length - 1 && <div className="step-connector"></div>}
+                      </div>
+                      <div style={{ paddingTop: 6 }}>
+                        <h3 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 20, color: '#0f1e3d', margin: '0 0 10px' }}>{s.title}</h3>
+                        <p style={{ fontFamily: 'Inter', fontSize: 15, lineHeight: 1.65, color: '#4b5563', margin: 0 }}>{s.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ── Features ──
+    function Features({ accentColor }) {
+      const features = [
+        {
+          icon: (
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="2" y="2" width="24" height="24" rx="8" fill={accentColor + '18'}/>
+              <path d="M9 14a5 5 0 0 1 5-5m5 5a5 5 0 0 1-5 5" stroke={accentColor} strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="14" cy="14" r="2" fill={accentColor}/>
+              <path d="M14 8V6M14 22v-2M20 14h2M6 14h2" stroke={accentColor} strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          ),
+          title: 'Replaces 20-Minute Insurance Calls Instantly',
+          desc: 'AI handles hold times, phone trees, and insurance reps so your staff never has to. What used to take your front desk 20+ minutes now completes automatically in the background.',
+        },
+        {
+          icon: (
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="2" y="2" width="24" height="24" rx="8" fill={accentColor + '18'}/>
+              <rect x="7" y="8" width="14" height="4" rx="2" stroke={accentColor} strokeWidth="1.8"/>
+              <rect x="7" y="16" width="9" height="4" rx="2" stroke={accentColor} strokeWidth="1.8"/>
+              <path d="M19 18.5l1.5 1.5 2.5-2.5" stroke="#16a34a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          ),
+          title: 'Works With Any Insurance, No Portal Needed',
+          desc: 'Calls insurers just like a human would. No API limitations, no portal logins, no compatibility issues. If they have a phone number, DentiVerify can verify it.',
+        },
+        {
+          icon: (
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="2" y="2" width="24" height="24" rx="8" fill={accentColor + '18'}/>
+              <path d="M8 10h12M8 14h8M8 18h5" stroke={accentColor} strokeWidth="1.8" strokeLinecap="round"/>
+              <circle cx="21" cy="18" r="3.5" fill="#dcfce7" stroke="#16a34a" strokeWidth="1.5"/>
+              <path d="M19.5 18l1 1 2-2" stroke="#16a34a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          ),
+          title: 'Structured Results, Ready to Use',
+          desc: 'Coverage, deductibles, frequencies, and eligibility status are delivered clean and organized directly into your workflow. No transcription, no copy-paste, no guesswork.',
+        },
+      ];
+      return (
+        <section id="features" style={{ padding: '96px 24px', background: '#f5f4f2' }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+            <FadeIn>
+              <div style={{ textAlign: 'center', marginBottom: 56 }}>
+                <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: accentColor, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Features</p>
+                <h2 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(28px,4vw,44px)', color: '#0f1e3d', margin: 0, letterSpacing: '-0.02em' }}>Everything your front desk needs. Nothing they don't.</h2>
+              </div>
+            </FadeIn>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 24 }}>
+              {features.map((f, i) => (
+                <FadeIn key={i} delay={i * 110}>
+                  <div className="feature-card">
+                    <div style={{ marginBottom: 20 }}>{f.icon}</div>
+                    <h3 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 18, color: '#0f1e3d', margin: '0 0 12px', lineHeight: 1.3 }}>{f.title}</h3>
+                    <p style={{ fontFamily: 'Inter', fontSize: 15, lineHeight: 1.65, color: '#4b5563', margin: 0 }}>{f.desc}</p>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ── Social Proof ──
+    function SocialProof({ show }) {
+      if (!show) return null;
+      const testimonials = [
+        { quote: "We used to spend 2 hours a day just on insurance calls. DentiVerify completely eliminated that. Our front desk finally has time to focus on patients.", name: 'Jamie L.', role: 'Front Desk Coordinator', office: 'Riverside Family Dental' },
+        { quote: "I was skeptical at first, but the accuracy is incredible. It catches coverage details we used to miss, and there are zero manual errors now.", name: 'Marcus T.', role: 'Office Manager', office: 'Summit Dental Group' },
+        { quote: "As a solo practice, I can't afford to have my staff tied up on hold all day. DentiVerify paid for itself in the first week.", name: 'Dr. Priya R.', role: 'Solo Practitioner', office: 'Priya Rao, DDS' },
+      ];
+      return (
+        <section style={{ padding: '96px 24px', background: '#fdfcfb' }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+            <FadeIn>
+              <div style={{ textAlign: 'center', marginBottom: 52 }}>
+                <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Trusted by dental offices across the country</p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
+                  {[0,1,2,3,4].map(i => <span key={i} style={{ color: '#f59e0b', fontSize: 20 }}>★</span>)}
+                </div>
+                <span style={{ fontFamily: 'Inter', fontSize: 13, color: '#9ca3af' }}>500+ offices · 4.9/5 average rating</span>
+              </div>
+            </FadeIn>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 24 }}>
+              {testimonials.map((t, i) => (
+                <FadeIn key={i} delay={i * 110}>
+                  <div className="testimonial-card">
+                    <div style={{ display: 'flex', gap: 2, marginBottom: 16 }}>
+                      {[0,1,2,3,4].map(j => <span key={j} style={{ color: '#f59e0b', fontSize: 14 }}>★</span>)}
+                    </div>
+                    <p style={{ fontFamily: 'Inter', fontSize: 15, lineHeight: 1.7, color: '#374151', margin: '0 0 20px', fontStyle: 'italic' }}>"{t.quote}"</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderTop: '1px solid #f3f4f6', paddingTop: 16 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 15, color: '#2563eb', flexShrink: 0 }}>
+                        {t.name[0]}
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 14, color: '#0f1e3d' }}>{t.name}</div>
+                        <div style={{ fontFamily: 'Inter', fontSize: 12, color: '#6b7280' }}>{t.role} · {t.office}</div>
+                      </div>
+                    </div>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ── Demo Form ──
+    function DemoForm({ accentColor }) {
+      const [form, setForm] = useState({ name: '', practice: '', email: '', phone: '', volume: '' });
+      const [submitted, setSubmitted] = useState(false);
+      const [errors, setErrors] = useState({});
+
+      function validate() {
+        const e = {};
+        if (!form.name.trim()) e.name = 'Required';
+        if (!form.practice.trim()) e.practice = 'Required';
+        if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) e.email = 'Valid email required';
+        if (!form.phone.trim()) e.phone = 'Required';
+        return e;
+      }
+
+      function handleSubmit(ev) {
+        ev.preventDefault();
+        const e = validate();
+        if (Object.keys(e).length) { setErrors(e); return; }
+        setSubmitted(true);
+      }
+
+      return (
+        <section id="demo" style={{ padding: '96px 24px', background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #2563eb 100%)' }}>
+          <div style={{ maxWidth: 680, margin: '0 auto' }}>
+            <FadeIn>
+              <div style={{ textAlign: 'center', marginBottom: 48 }}>
+                <h2 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(28px,4vw,44px)', color: 'white', margin: '0 0 14px', letterSpacing: '-0.02em' }}>See DentiVerify in Action</h2>
+                <p style={{ fontFamily: 'Inter', fontSize: 17, color: '#bfdbfe', margin: 0, lineHeight: 1.6 }}>Book a 15-minute demo and watch us verify a patient live. No commitment required.</p>
+              </div>
+            </FadeIn>
+            {submitted ? (
+              <FadeIn>
+                <div style={{ background: 'white', borderRadius: 20, padding: '48px 40px', textAlign: 'center' }}>
+                  <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M8 16.5L13 21.5L24 10.5" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                  <h3 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 24, color: '#0f1e3d', margin: '0 0 10px' }}>You're on the list!</h3>
+                  <p style={{ fontFamily: 'Inter', fontSize: 15, color: '#6b7280', margin: 0 }}>We'll reach out within 1 business day to schedule your personalized demo.</p>
+                </div>
+              </FadeIn>
+            ) : (
+              <FadeIn>
+                <form onSubmit={handleSubmit} style={{ background: 'white', borderRadius: 20, padding: '40px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <div>
+                      <label style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#374151', display: 'block', marginBottom: 6 }}>Full Name *</label>
+                      <input className="form-input" placeholder="Sarah Johnson" value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} />
+                      {errors.name && <span style={{ fontSize: 12, color: '#dc2626', fontFamily: 'Inter' }}>{errors.name}</span>}
+                    </div>
+                    <div>
+                      <label style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#374151', display: 'block', marginBottom: 6 }}>Practice Name *</label>
+                      <input className="form-input" placeholder="Sunrise Dental" value={form.practice} onChange={e => setForm(f => ({...f, practice: e.target.value}))} />
+                      {errors.practice && <span style={{ fontSize: 12, color: '#dc2626', fontFamily: 'Inter' }}>{errors.practice}</span>}
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <div>
+                      <label style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#374151', display: 'block', marginBottom: 6 }}>Work Email *</label>
+                      <input className="form-input" type="email" placeholder="sarah@sunrisedental.com" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))} />
+                      {errors.email && <span style={{ fontSize: 12, color: '#dc2626', fontFamily: 'Inter' }}>{errors.email}</span>}
+                    </div>
+                    <div>
+                      <label style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#374151', display: 'block', marginBottom: 6 }}>Phone Number *</label>
+                      <input className="form-input" type="tel" placeholder="(555) 000-0000" value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} />
+                      {errors.phone && <span style={{ fontSize: 12, color: '#dc2626', fontFamily: 'Inter' }}>{errors.phone}</span>}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#374151', display: 'block', marginBottom: 6 }}>Verifications per day</label>
+                    <select className="form-input" value={form.volume} onChange={e => setForm(f => ({...f, volume: e.target.value}))}>
+                      <option value="">Select range…</option>
+                      <option value="1-10">1–10 verifications/day</option>
+                      <option value="11-25">11–25 verifications/day</option>
+                      <option value="26-50">26–50 verifications/day</option>
+                      <option value="50+">50+ verifications/day</option>
+                    </select>
+                  </div>
+                  <button className="btn-primary" type="submit" style={{ padding: '15px 28px', fontSize: 16, justifyContent: 'center', marginTop: 8, background: accentColor }}>
+                    Request My Demo
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </button>
+                  <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#9ca3af', textAlign: 'center', margin: 0 }}>No commitment required · We'll respond within 1 business day</p>
+                </form>
+              </FadeIn>
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    // ── Footer ──
+    function Footer({ accentColor }) {
+      return (
+        <footer style={{ background: '#0f1e3d', padding: '48px 24px 32px' }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 32, marginBottom: 40 }}>
+              <div style={{ maxWidth: 280 }}>
+                <Logo color={accentColor} />
+                <p style={{ fontFamily: 'Inter', fontSize: 14, color: '#93c5fd', marginTop: 12, lineHeight: 1.65 }}>
+                  AI-powered dental insurance verification. Automated calls, structured results, zero hold music.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 48, flexWrap: 'wrap' }}>
+                {[['Product', ['How It Works','Features','Request Demo']],['Company', ['Privacy Policy','Terms of Service']]].map(([section, links]) => (
+                  <div key={section}>
+                    <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 13, color: 'white', marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{section}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {links.map(link => (
+                        <a key={link} href="#" style={{ fontFamily: 'Inter', fontSize: 14, color: '#93c5fd', textDecoration: 'none', transition: 'color 0.15s' }}
+                          onMouseEnter={e => e.target.style.color = 'white'}
+                          onMouseLeave={e => e.target.style.color = '#93c5fd'}
+                        >{link}</a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ borderTop: '1px solid #1e3a6e', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+              <span style={{ fontFamily: 'Inter', fontSize: 13, color: '#4b6d9e' }}>© 2025 DentiVerify. All rights reserved.</span>
+              <span style={{ fontFamily: 'Inter', fontSize: 13, color: '#4b6d9e' }}>HIPAA-Compliant · SOC 2 Type II</span>
+            </div>
+          </div>
+        </footer>
+      );
+    }
+
+    // ── App ──
+    function App() {
+      const [tweaks, setTweak] = window.useTweaks(TWEAK_DEFAULTS);
+      const { TweaksPanel, TweakColor, TweakText, TweakToggle, TweakSection } = window;
+      const accentColor = tweaks.accentColor || '#2563eb';
+
+      return (
+        <>
+          <Nav accentColor={accentColor} ctaPrimary={tweaks.ctaPrimary} />
+          <Hero tweaks={tweaks} accentColor={accentColor} />
+          <PainPoints />
+          <HowItWorks accentColor={accentColor} />
+          <Features accentColor={accentColor} />
+          <SocialProof show={tweaks.showSocialProof} />
+          <DemoForm accentColor={accentColor} />
+          <Footer accentColor={accentColor} />
+
+          <TweaksPanel>
+            <TweakSection label="Brand">
+              <TweakColor label="Accent Color" tweakKey="accentColor" />
+            </TweakSection>
+            <TweakSection label="Hero">
+              <TweakText label="Headline" tweakKey="heroHeadline" />
+              <TweakText label="Primary CTA" tweakKey="ctaPrimary" />
+              <TweakText label="Secondary CTA" tweakKey="ctaSecondary" />
+            </TweakSection>
+            <TweakSection label="Sections">
+              <TweakToggle label="Show Social Proof" tweakKey="showSocialProof" />
+            </TweakSection>
+          </TweaksPanel>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

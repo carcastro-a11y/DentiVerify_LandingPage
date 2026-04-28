@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — DentiVerify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f5f4f2; min-height: 100vh; display: flex; flex-direction: column; }
+
+    @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+    .card { animation: fade-up 0.5s ease both; }
+
+    .input-field {
+      width: 100%;
+      border: 1.5px solid #ddd9d3;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: #0f1e3d;
+      background: white;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .input-field:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+
+    .btn-primary {
+      width: 100%;
+      background: #2563eb;
+      color: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      padding: 13px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 4px 16px rgba(37,99,235,0.3); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { background: #93c5fd; cursor: not-allowed; transform: none; box-shadow: none; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function Logo({ color = '#2563eb' }) {
+      return (
+        <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 22, color: '#0f1e3d', letterSpacing: '-0.02em' }}>
+          Denti<span style={{ color }}>Verify</span>
+          <svg style={{ display: 'inline', marginLeft: 3, verticalAlign: 'middle' }} width="20" height="20" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="8.5" fill={color} fillOpacity="0.12" stroke={color} strokeWidth="1.2" />
+            <path d="M5.5 9.2L7.8 11.5L12.5 6.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      );
+    }
+
+    function LoginPage() {
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [showPass, setShowPass] = useState(false);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState('');
+      const [errors, setErrors] = useState({});
+
+      function validate() {
+        const e = {};
+        if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) e.email = 'Enter a valid email address';
+        if (!password) e.password = 'Password is required';
+        return e;
+      }
+
+      function handleSubmit(ev) {
+        ev.preventDefault();
+        const e = validate();
+        if (Object.keys(e).length) { setErrors(e); return; }
+        setErrors({});
+        setLoading(true);
+        setError('');
+        // Simulate auth
+        setTimeout(() => {
+          setLoading(false);
+          setError('Invalid email or password. Please try again.');
+        }, 1400);
+      }
+
+      return (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {/* Top bar */}
+          <header style={{ background: 'white', borderBottom: '1px solid #ece9e4', padding: '0 32px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <a href="DentiVerify.html" style={{ textDecoration: 'none' }}><Logo /></a>
+            <a href="DentiVerify.html" style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 500, fontSize: 14, color: '#4b5563', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="#4b5563" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Back to site
+            </a>
+          </header>
+
+          {/* Main */}
+          <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
+            <div className="card" style={{ width: '100%', maxWidth: 420 }}>
+              {/* Card */}
+              <div style={{ background: 'white', borderRadius: 20, border: '1px solid #ece9e4', boxShadow: '0 16px 56px rgba(15,30,61,0.10)', padding: '40px 36px' }}>
+                {/* Header */}
+                <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 20, padding: '5px 14px', marginBottom: 20 }}>
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#2563eb', animation: 'pulse-dot 1.5s ease-in-out infinite' }}></div>
+                    <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 12, color: '#2563eb' }}>Portal Access</span>
+                  </div>
+                  <h1 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 26, color: '#0f1e3d', letterSpacing: '-0.02em', marginBottom: 8 }}>Welcome back</h1>
+                  <p style={{ fontFamily: 'Inter', fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>Sign in to your DentiVerify dashboard to manage verifications and view results.</p>
+                </div>
+
+                {/* Error banner */}
+                {error && (
+                  <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', marginBottom: 20, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="8" cy="8" r="7.5" stroke="#dc2626" strokeWidth="1.2"/><path d="M8 5v3.5M8 10.5v.5" stroke="#dc2626" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                    <span style={{ fontFamily: 'Inter', fontSize: 13, color: '#dc2626' }}>{error}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div>
+                    <label style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#374151', display: 'block', marginBottom: 6 }}>Work Email</label>
+                    <input
+                      className="input-field"
+                      type="email"
+                      placeholder="you@yourpractice.com"
+                      value={email}
+                      onChange={e => { setEmail(e.target.value); setErrors(er => ({...er, email: ''})); setError(''); }}
+                      autoComplete="email"
+                      style={{ borderColor: errors.email ? '#dc2626' : undefined }}
+                    />
+                    {errors.email && <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#dc2626', display: 'block', marginTop: 4 }}>{errors.email}</span>}
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <label style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 13, color: '#374151' }}>Password</label>
+                      <a href="#" style={{ fontFamily: 'Inter', fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
+                        onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+                        onMouseLeave={e => e.target.style.textDecoration = 'none'}>Forgot password?</a>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        className="input-field"
+                        type={showPass ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={e => { setPassword(e.target.value); setErrors(er => ({...er, password: ''})); setError(''); }}
+                        autoComplete="current-password"
+                        style={{ paddingRight: 44, borderColor: errors.password ? '#dc2626' : undefined }}
+                      />
+                      <button type="button" onClick={() => setShowPass(s => !s)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#9ca3af' }}>
+                        {showPass
+                          ? <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1.5 9s3-5.5 7.5-5.5S16.5 9 16.5 9s-3 5.5-7.5 5.5S1.5 9 1.5 9z" stroke="currentColor" strokeWidth="1.5"/><circle cx="9" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M3 3l12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                          : <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1.5 9s3-5.5 7.5-5.5S16.5 9 16.5 9s-3 5.5-7.5 5.5S1.5 9 1.5 9z" stroke="currentColor" strokeWidth="1.5"/><circle cx="9" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg>
+                        }
+                      </button>
+                    </div>
+                    {errors.password && <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#dc2626', display: 'block', marginTop: 4 }}>{errors.password}</span>}
+                  </div>
+
+                  <button className="btn-primary" type="submit" disabled={loading} style={{ marginTop: 4 }}>
+                    {loading
+                      ? <>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: 'spin 0.8s linear infinite' }}><circle cx="8" cy="8" r="6.5" stroke="white" strokeWidth="2" strokeDasharray="20 10" strokeLinecap="round"/></svg>
+                          Signing in…
+                        </>
+                      : <>Sign In<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></>
+                    }
+                  </button>
+                </form>
+
+                {/* Divider */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '24px 0' }}>
+                  <div style={{ flex: 1, height: 1, background: '#ece9e4' }}></div>
+                  <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#9ca3af' }}>or</span>
+                  <div style={{ flex: 1, height: 1, background: '#ece9e4' }}></div>
+                </div>
+
+                {/* SSO */}
+                <button style={{ width: '100%', background: 'white', border: '1.5px solid #ddd9d3', borderRadius: 8, padding: '11px', fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 14, color: '#0f1e3d', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'border-color 0.2s, box-shadow 0.2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#2563eb'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#ddd9d3'; e.currentTarget.style.boxShadow = 'none'; }}>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <rect x="2" y="2" width="6" height="6" rx="1" fill="#4285f4"/>
+                    <rect x="10" y="2" width="6" height="6" rx="1" fill="#ea4335"/>
+                    <rect x="2" y="10" width="6" height="6" rx="1" fill="#34a853"/>
+                    <rect x="10" y="10" width="6" height="6" rx="1" fill="#fbbc04"/>
+                  </svg>
+                  Continue with Google SSO
+                </button>
+
+                <p style={{ textAlign: 'center', fontFamily: 'Inter', fontSize: 13, color: '#9ca3af', marginTop: 24 }}>
+                  Don't have an account?{' '}
+                  <a href="DentiVerify.html#demo" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 500 }}
+                    onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+                    onMouseLeave={e => e.target.style.textDecoration = 'none'}>Request a demo</a>
+                </p>
+              </div>
+
+              {/* Security note */}
+              <div style={{ textAlign: 'center', marginTop: 20, display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+                {[['🔒','HIPAA Compliant'],['🛡️','SOC 2 Type II'],['🔑','256-bit Encryption']].map(([icon, label]) => (
+                  <span key={label} style={{ fontFamily: 'Inter', fontSize: 12, color: '#9ca3af', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span>{icon}</span>{label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<LoginPage />);
+  </script>
+  <style>
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  </style>
+</body>
+</html>
