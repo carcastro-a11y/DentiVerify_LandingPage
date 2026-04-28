@@ -617,6 +617,7 @@
       const [form, setForm] = useState({ name: '', practice: '', email: '', phone: '', volume: '' });
       const [submitted, setSubmitted] = useState(false);
       const [errors, setErrors] = useState({});
+      const [sending, setSending] = useState(false);
 
       function validate() {
         const e = {};
@@ -631,7 +632,16 @@
         ev.preventDefault();
         const e = validate();
         if (Object.keys(e).length) { setErrors(e); return; }
-        setSubmitted(true);
+        setSending(true);
+        fetch('https://formspree.io/f/meevyzvr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(form),
+        })
+          .then(res => res.json())
+          .then(() => setSubmitted(true))
+          .catch(() => setSubmitted(true))
+          .finally(() => setSending(false));
       }
 
       return (
@@ -690,9 +700,9 @@
                       <option value="50+">50+ verifications/day</option>
                     </select>
                   </div>
-                  <button className="btn-primary" type="submit" style={{ padding: '15px 28px', fontSize: 16, justifyContent: 'center', marginTop: 8, background: accentColor }}>
-                    Request My Demo
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <button className="btn-primary" type="submit" disabled={sending} style={{ padding: '15px 28px', fontSize: 16, justifyContent: 'center', marginTop: 8, background: accentColor, opacity: sending ? 0.7 : 1 }}>
+                    {sending ? 'Sending...' : 'Request My Demo'}
+                    {!sending && <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </button>
                   <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#9ca3af', textAlign: 'center', margin: 0 }}>No commitment required · We'll respond within 1 business day</p>
                 </form>
